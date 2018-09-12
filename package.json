@@ -1,0 +1,8 @@
+{
+  "name": "scroll",
+  "version": "0.0.0",
+  "description": "Collection of utility scripts for versioning, releasing, etc.",
+  "author": "Jason Karns <jason.karns@gmail.com> (http://jason.karns.name/)",
+  "scripts": { },
+  "license": "MIT"
+}

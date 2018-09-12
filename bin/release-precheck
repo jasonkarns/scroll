@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+# Usage: script/release-precheck
+#
+# - ensure currently on master branch
+# - ensure in sync with origin
+# - ensure it isn't already tagged
+# - ensure there are actual changes to release
+
+set -e
+
+abort() {
+  echo "Aborting: $1" >&2
+  exit 1
+}
+
+git fetch --quiet --tags origin master
+
+current_branch="$(git symbolic-ref --short HEAD)"
+if [ "$current_branch" != master ]; then
+  abort "Not currently on master branch"
+fi
+
+commits_behind_remote="$(git rev-list --count --right-only HEAD...origin/master)"
+if [ "$commits_behind_remote" != 0 ]; then
+  abort "Local master is behind origin/master"
+fi
+
+existing="$(git tag --points-at HEAD)"
+if [ -n "$existing" ]; then
+  abort "HEAD is already tagged as '${existing}'"
+fi
+
+previous_tag="$(git describe --tags --abbrev=0)"
+if git diff --quiet "${previous_tag}..HEAD" -- "$@"; then
+  abort "No new features to release since '${previous_tag}'"
+fi
